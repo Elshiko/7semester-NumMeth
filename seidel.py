@@ -14,7 +14,9 @@ class seidel:
             old_matr.sum_rows(row, to_add)
             old_vect.add_elem(row, old_vect.get_elem(to_add))
             break
-    #TODO check a[ii] >= sum(a[ij]) i != j
+      if old_matr.get(row, row) == 0:
+        return old_matr, old_vect, "Exist column with 0 in all rows"
+    #TODO convert to a[ii] >= sum(a[ij]) i != j
     if not old_matr.diagonal_dominance():
       return old_matr, old_vect, "There no diagonal dominance"
     for row in range(0, dim):

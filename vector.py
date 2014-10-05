@@ -47,5 +47,5 @@ class vector:
   def rate(self):
     rate = 0
     for num in range(0, len(self.data)):
-      rate += self.data[num] * self.data[num]
+      rate += self.data[num] ** 2
     return pow(rate, 0.5)

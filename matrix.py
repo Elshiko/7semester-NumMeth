@@ -59,7 +59,7 @@ class matrix:
     rate = 0
     for row in range(0, self.size()):
       for col in range(0, len(self.data[row])):
-        rate += self.data[row][col]*self.data[row][col]
+        rate += self.data[row][col] ** 2
     return pow(rate, 0.5)
 
   def diagonal_dominance(self):
