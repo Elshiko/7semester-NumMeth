@@ -15,12 +15,14 @@ class seidel:
             old_vect.add_elem(row, old_vect.get_elem(to_add))
             break
     #TODO check a[ii] >= sum(a[ij]) i != j
+    if not old_matr.diagonal_dominance():
+      return old_matr, old_vect, "There no diagonal dominance"
     for row in range(0, dim):
       multiplier = -1/old_matr.get(row, row)
       old_matr.mult_row(row, multiplier)
       old_vect.mult_elem(row, -multiplier)
       old_matr.set_elem(row, row, 0)
-    return old_matr, old_vect
+    return old_matr, old_vect, "OK"
 
   def check_precision(cur_approx, next_approx, precision):
     #||x(k) - x(k+1)|| <= precision
@@ -28,6 +30,9 @@ class seidel:
     for num in range(0, next_approx.size()):
       rate += pow(cur_approx.get_elem(num) - next_approx.get_elem(num), 2)
     return pow(rate, 0.5) <= precision
+
+  def calculate_real_precision(self, rate, precision):
+    return (1 - rate)/rate*precision
 
   def find_solution(self, matr, vect, precision):
     error = "OK"
@@ -38,18 +43,14 @@ class seidel:
       error = "Different size of matrix and vector"
       return vect, error
     dim = vect.size()
-    matr, vect = self.transform(matr, vect)
+    matr, vect, error = self.transform(matr, vect)
+    if error != "OK":
+      return vect, error
     upper_triangular, lower_triangular = matr.diagonal_split()
-    print()
-    upper_triangular.print()
-    print()
-    lower_triangular.print()
-    print()
-    #check ||(E-LOWER)^-1 * UPPER|| < 1 if need
     cur_approx = vector.vector(vect)
     next_approx = vector.vector(vect)
+    precision = self.calculate_real_precision(matr.rate(), precision)
     while True:
-      cur_approx.print()
       for row in range(0, dim):
         new_elem = 0
         for col in range(0, dim):
@@ -57,8 +58,7 @@ class seidel:
           new_elem += cur_approx.get_elem(col)*upper_triangular.get(row, col)
         new_elem += vect.get_elem(row)
         next_approx.set_elem(row, new_elem)
-      #GET K+1 approx
       if seidel.check_precision(cur_approx, next_approx, precision):
         break
       cur_approx = vector.vector(next_approx)
-    return next_approx
+    return next_approx, error

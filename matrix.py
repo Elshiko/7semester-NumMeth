@@ -55,6 +55,26 @@ class matrix:
       for col in range(0, len(self.data[row])):
         self.data[row][col] += self.data[to_add][col]
 
+  def rate(self):
+    rate = 0
+    for row in range(0, self.size()):
+      for col in range(0, len(self.data[row])):
+        rate += self.data[row][col]*self.data[row][col]
+    return pow(rate, 0.5)
+
+  def diagonal_dominance(self):
+    dominance = True
+    for row in range(0, self.size()):
+      diag_elem = abs(self.data[row][row])
+      row_sum = 0
+      for col in range(0, len(self.data[row])):
+        if col == row:
+          continue
+        row_sum += abs(self.data[row][col])
+      if row_sum > diag_elem:
+        dominance = False
+    return dominance
+
   def diagonal_split(self):
     size = len(self.data)
     upper_triangular = []
