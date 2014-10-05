@@ -4,11 +4,11 @@ import vector
 import seidel
 import array
 
-a = [[0.1, 0.2, 0.3],[0.4, 0.5, 0.6],[0.7, 0.8, 0.9]]
+a = [[15, 2, -1, -1],[1, -10, -1, -2],[2, 1, 12, 1], [1, 1, 1, 11]]
 A = matrix.matrix(a)
-V = vector.vector([0, 0.3, 0.6])
+V = vector.vector([22, -14, -10, -20])
 c = seidel.seidel()
-sol = c.find_solution(A, V, 1e-16)
+sol = c.find_solution(A, V, 1e-1)
 sol.print()
 
 #0.01x1 + 0.02x2 + 0.03x3 = 0

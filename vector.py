@@ -40,6 +40,10 @@ class vector:
     if num < len(self.data):
       self.data[num] *= multiplier
 
+  def add_elem(self, num, add):
+    if num < len(self.data):
+      self.data[num] += add
+
   def rate(self):
     rate = 0
     for num in range(0, len(self.data)):

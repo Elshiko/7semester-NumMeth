@@ -5,9 +5,22 @@ class seidel:
   def __init__(self):
     pass
 
-  def transform(self, old_matr):
-    pass
-    #TODO
+  def transform(self, old_matr, old_vect):
+    dim = old_matr.size()
+    for row in range(0, dim):
+      if old_matr.get(row, row) == 0:
+        for to_add in range(0, dim):
+          if old_matr.get(to_add, row) != 0:
+            old_matr.sum_rows(row, to_add)
+            old_vect.add_elem(row, old_vect.get_elem(to_add))
+            break
+    #TODO check a[ii] >= sum(a[ij]) i != j
+    for row in range(0, dim):
+      multiplier = -1/old_matr.get(row, row)
+      old_matr.mult_row(row, multiplier)
+      old_vect.mult_elem(row, -multiplier)
+      old_matr.set_elem(row, row, 0)
+    return old_matr, old_vect
 
   def check_precision(cur_approx, next_approx, precision):
     #||x(k) - x(k+1)|| <= precision
@@ -25,8 +38,13 @@ class seidel:
       error = "Different size of matrix and vector"
       return vect, error
     dim = vect.size()
-    matr = self.transform(matr)
+    matr, vect = self.transform(matr, vect)
     upper_triangular, lower_triangular = matr.diagonal_split()
+    print()
+    upper_triangular.print()
+    print()
+    lower_triangular.print()
+    print()
     #check ||(E-LOWER)^-1 * UPPER|| < 1 if need
     cur_approx = vector.vector(vect)
     next_approx = vector.vector(vect)

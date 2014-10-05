@@ -50,6 +50,11 @@ class matrix:
     if row < len(self.data) and col < len(self.data[row]):
       self.data[row][col] = element
 
+  def sum_rows(self, row, to_add):
+    if row < self.size() and to_add < self.size():
+      for col in range(0, len(self.data[row])):
+        self.data[row][col] += self.data[to_add][col]
+
   def diagonal_split(self):
     size = len(self.data)
     upper_triangular = []
