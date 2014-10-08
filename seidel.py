@@ -34,9 +34,9 @@ class seidel:
     return pow(rate, 0.5) <= precision
 
   def calculate_real_precision(self, rate, precision):
-    return (1 - rate)/rate*precision
+    return ((1 - rate)/rate)*precision
 
-  def find_solution(self, matr, vect, precision):
+  def find_solution(self, matr, vect, precision, iterations):
     error = "OK"
     if not matr.is_square():
       error = "Coefficient matrix is not square"
@@ -51,8 +51,11 @@ class seidel:
     upper_triangular, lower_triangular = matr.diagonal_split()
     cur_approx = vector.vector(vect)
     next_approx = vector.vector(vect)
+    if (matr.rate() == 0):
+      return vect, 'Matrix rate = 0'
     precision = self.calculate_real_precision(matr.rate(), precision)
-    while True:
+    iteration_num = 0
+    while iteration_num < iterations:
       for row in range(0, dim):
         new_elem = 0
         for col in range(0, dim):

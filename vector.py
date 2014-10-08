@@ -1,3 +1,5 @@
+import json
+
 class vector:
   def __init__(self, vector):
     correct = True
@@ -49,3 +51,20 @@ class vector:
     for num in range(0, len(self.data)):
       rate += self.data[num] ** 2
     return pow(rate, 0.5)
+
+  def to_json(self):
+   return json.dumps(self.data)
+
+  def to_csv(self, separator, amount):
+    csv_string = ''
+    for num in range(0, len(self.data)):
+      csv_string += format(self.data[num], '.' + str(amount) + 'f') + ','
+    csv_string = csv_string[0:-1]
+    return csv_string
+
+  def to_string(self, amount):
+    string = ''
+    form_param = '.' + str(amount) + 'f'
+    for num in range(0, len(self.data)):
+      string += format(self.data[num], '.' + str(amount) + 'f') + ' '
+    return string
