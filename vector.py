@@ -2,12 +2,13 @@ import json
 
 class vector:
   def __init__(self, vector):
+    """Vector must be list of int/float"""
     correct = True
     self.filled = False
+    self.data = []
     if type(vector) == type(self):
-      self.data = []
-      for num in range(0, vector.size()):
-        self.data.append(vector.get_elem(num))
+      vector = vector.to_string().split(' ')
+      self.data = vector[:]
       self.filled = True
       return
     if type(vector) == list:
@@ -18,13 +19,15 @@ class vector:
       correct = False
     if correct:
       self.filled = True
-      self.data = list(vector)
-    else:
-      self.data = []
+      self.data = vector[:]
 
-  def print(self):
-    for num in range(0, len(self.data)):
-      print('{0:.6f} '.format(self.data[num]), end = '')
+  def print(self, precision = 6):
+    if type(precision) != int:
+      print('Incorrect preciosion type, ignored')
+      precision = 6
+    pattern = '{0:.' + str(precision) + 'f} '
+    for num in range(len(self.data)):
+      print(pattern.format(self.data[num]), end = '')
     print()
 
   def size(self):
@@ -47,22 +50,23 @@ class vector:
       self.data[num] += add
 
   def rate(self):
+    """Euclidean rate"""
     rate = 0
-    for num in range(0, len(self.data)):
+    for num in range(len(self.data)):
       rate += self.data[num] ** 2
     return pow(rate, 0.5)
 
   def to_json(self):
    return json.dumps(self.data)
 
-  def to_csv(self, separator, amount):
+  def to_csv(self, separator = ',', amount = 6):
     csv_string = ''
     for num in range(0, len(self.data)):
       csv_string += format(self.data[num], '.' + str(amount) + 'f') + ','
     csv_string = csv_string[0:-1]
     return csv_string
 
-  def to_string(self, amount):
+  def to_string(self, amount = 6):
     string = ''
     form_param = '.' + str(amount) + 'f'
     for num in range(0, len(self.data)):

@@ -46,20 +46,20 @@ def set_default(params):
     params['amount'] = 10
 
 def print_help():
-  print('--help --> print this information')
-  print('--input_file=$PATH --> read equation from that file')
-  print('Deafault mode = read from stdin')
-  print('--output_file=$PATH --> print answer to that file')
-  print('Deafault mode = print to stdout')
-  print('--input_type=FORMAT --> read equation as you choose')
-  print('--output_type=FORMAT --> print equation as you choose')
-  print('FORMAT = \'JSON\', or \'interactive\', or \'CSV\'')
-  print('JSON & CSV consist of N lines of N+1 element, matrix N*N and column of free terms')
-  print('interactive format: N - dim of matrix, N lines of N elements, 1 line of N elements(free terms)')
-  print('--precision=X --> X is a number, precision of calculation')
-  print('--separator=S --> S is separator in .csv file')
-  print('--iterations=Z --> Z is number of iterations')
-  print('--amount=Z --> amount of numbers after . in double')
+  print('--help --> print this information\n'
+  '--input_file=$PATH --> read equation from that file\n'
+  'Deafault mode = read from stdin\n'
+  'output_file=$PATH --> print answer to that file\n'
+  'Deafault mode = print to stdout\n'
+  'input_type=FORMAT --> read equation as you choose\n'
+  'output_type=FORMAT --> print equation as you choose\n'
+  'FORMAT = \'JSON\', or \'interactive\', or \'CSV\'\n'
+  'JSON & CSV consist of N lines of N+1 element, matrix N*N and column of free terms\n'
+  'interactive format: N - dim of matrix, N lines of N elements, 1 line of N elements(free terms)\n'
+  'precision=X --> X is a number, precision of calculation\n'
+  'separator=S --> S is separator in .csv file\n'
+  'iterations=Z --> Z is number of iterations\n'
+  'amount=Z --> amount of numbers after . in double\n')
 
 error = 'OK'
 params, error = parse_params()
@@ -84,27 +84,17 @@ else:
           params['separator'], matr_list, vect_list, False)
     if error != 'OK':
       print(error)
-      exit(0)
+      exit(1)
     matr = matrix(matr_list)
     vect = vector(vect_list)
     solver = seidel()
     solution, error = solver.find_solution(matr, vect, precision, iterations)
     if error != 'OK':
       print(error)
-      exit(0)
+      exit(1)
     if 'output_file' in params:
       io_lib.write(params['output_file'], params['output_type'],
           params['separator'], solution, True, params['amount'])
     else:
       io_lib.write('', params['output_type'],
           params['separator'], solution, False, params['amount'])
-
-  #a = [[15, 2, -1, -1],[1, -10, -1, -2],[2, 1, 12, 1], [1, 1, 1, 11]]
-  #A = matrix.matrix(a)
-  #V = vector.vector([22, -14, -10, -20])
-  #c = seidel.seidel()
-  #sol, error = c.find_solution(A, V, 1e-1)
-  #if error != "OK":
-  #  print(error)
-  #else:
-  #  sol.print()
