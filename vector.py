@@ -8,7 +8,9 @@ class vector:
     self.data = []
     if type(vector) == type(self):
       vector = vector.to_string().split(' ')
-      self.data = vector[:]
+      self.data = vector[:-1]
+      for num in range(len(self.data)):
+        self.data[num] = float(self.data[num])
       self.filled = True
       return
     if type(vector) == list:
@@ -72,3 +74,13 @@ class vector:
     for num in range(0, len(self.data)):
       string += format(self.data[num], '.' + str(amount) + 'f') + ' '
     return string
+
+  def add(self, to_add):
+    if type(to_add) == vector:
+      if self.size() != to_add.size():
+        return 'Different sizes'
+      for num in range(self.size()):
+        self.add_elem(num, to_add.get_elem(num))
+      return 'OK'
+    else:
+      return 'Need ' + str(type(self)) + ', but recieved ' + str(type(to_add))

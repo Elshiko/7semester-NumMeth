@@ -1,10 +1,11 @@
+from vector import vector
+
 class matrix:
   #format data[i] - i-th row in matrix
-  def __init__(self, matrix):
+  def __init__(self, matrix = []):
     """Matrix must be list of lists of int/float"""
-    self.filled = False
     correct = True
-    self.data = []
+    self.__data = []
     if type(matrix) == list:
       for row in matrix:
         if type(row) == list:
@@ -15,81 +16,128 @@ class matrix:
     else:
       correct = False
     if correct:
-      self.data = [row[:] for row in matrix]
-      self.filled = True
+      self.__data = [row[:] for row in matrix]
 
   def generate_e(self, dim):
     """Method replace current matrix with E-matrix, dim --> dimension"""
     for row in range(dim):
-      self.data.append([0] * dim)
-      self.data[row][row] = 1
+      self.__data.append([0.0] * dim)
+      self.__data[row][row] = 1.0
 
   def print(self, precision = 6):
     if type(precision) != int:
       print('Incorrect precision type, ignored')
       precision = 6
     pattern = '{0:.' + str(precision) + 'f} '
-    for row in range(len(self.data)):
-      for col in range(len(self.data[row])):
-        print(pattern.format(self.data[row][col]), end = '')
+    for row in range(self.cnt_row()):
+      for col in range(self.cnt_col()):
+        print(pattern.format(self.__data[row][col]), end = '')
       print()
 
   def is_square(self):
-    square = True
-    row_cnt = len(self.data)
-    for row in self.data:
-      square &= row_cnt == len(row)
-    return square
+    return self.cnt_row() == self.cnt_col()
 
-  def size(self):
-    return len(self.data)
+  def cnt_row(self):
+    return len(self.__data)
+
+  def cnt_col(self):
+    return 0 if len(self.__data) == 0 else len(self.__data[0])
 
   def get(self, row, col):
-    return self.data[row][col]
+    return self.__data[row][col]
 
   def mult_row(self, row, multiplier):
-    for col in range(len(self.data[row])):
-      self.data[row][col] *= multiplier
+    if row < self.cnt_row():
+      for col in range(self.cnt_col()):
+        self.__data[row][col] *= multiplier
 
   def set_elem(self, row, col, element):
-    if row < len(self.data) and col < len(self.data[row]):
-      self.data[row][col] = element
+    if row < self.cnt_row() and col < self.cnt_col():
+      self.__data[row][col] = element
 
   def add_rows(self, row, to_add):
     """Add line number 'to_add' to line number 'row'"""
-    if row < self.size() and to_add < self.size():
-      for col in range(len(self.data[row])):
-        self.data[row][col] += self.data[to_add][col]
+    if row < self.cnt_row() and to_add < self.cnt_col():
+      for col in range(self.cnt_col()):
+        self.__data[row][col] += self.__data[to_add][col]
 
   def rate(self):
     """Euclidean rate"""
     rate = 0
-    for row in range(self.size()):
-      for col in range(len(self.data[row])):
-        rate += self.data[row][col] ** 2
+    for row in range(self.cnt_row()):
+      for col in range(self.cnt_col()):
+        rate += self.__data[row][col] ** 2
     return pow(rate, 0.5)
 
   def diagonal_dominance(self):
     """Check for ||a[i][i]|| >= Sum(||a[i][j]||)"""
     dominance = True
-    for row in range(len(self.data)):
-      diag_elem = abs(self.data[row][row])
+    for row in range(self.cnt_row()):
+      diag_elem = abs(self.__data[row][row])
       row_sum = 0
-      for col in range(len(self.data[row])):
-        if col == row:
-          continue
-        row_sum += abs(self.data[row][col])
+      for col in range(self.cnt_col()):
+        row_sum += abs(self.__data[row][col]) if col != row else 0
       dominance &= row_sum < diag_elem
     return dominance
 
   def diagonal_split(self):
-    """Split matrix A to U(upper) and L(lower)"""
-    size = len(self.data)
+    """Split matrix A to U(upper) and L(lower), need square matrix"""
     upper_triangular = []
     lower_triangular = []
+    if not self.is_square():
+      return upper_triangular, lower_triangular, 'Maxtrix must be square'
+    size = self.cnt_row()
     for row in range(size):
-      lower_triangular.append(self.data[row][:row] + [0] * (size - row))
-      upper_triangular.append([0] * row + self.data[row][row:])
+      lower_triangular.append(self.__data[row][:row] + [0.0] * (size - row))
+      upper_triangular.append([0.0] * row + self.__data[row][row:])
     upper_triangular = matrix(upper_triangular)
     lower_triangular = matrix(lower_triangular)
-    return upper_triangular, lower_triangular
+    return upper_triangular, lower_triangular, 'OK'
+
+  def get_dim(self):
+    return self.cnt_row(), self.cnt_col()
+
+  def minus(self, subtrahend):
+    if self.get_dim() != subtrahend.get_dim():
+      return 'Some problems with dimension'
+    for row in range(self.cnt_row()):
+      for col in range(self.cnt_col()):
+        self.__data[row][col] -= subtrahend.get(row, col)
+    return 'OK'
+
+  def add_row_with_ratio(self, row, to_add, ratio):
+    if self.cnt_row() > 0:
+      for col in range(self.cnt_col()):
+        self.__data[row][col] += self.__data[to_add][col] * ratio
+
+  def find_lower_square_reverse(self):
+    rev = matrix()
+    rev.generate_e(self.cnt_row())
+    for row in range(self.cnt_row()):
+      for col in range(row):
+        if self.__data[row][col] != 0:
+          multiplier = self.__data[row][col]
+          rev.add_row_with_ratio(row, col, -multiplier)
+    return rev
+
+  def multiply(self, multiplier):
+    error = 'Number of columns in first matrix must equal number of rows in second multiplier(matrix/vector)'
+    result = []
+    if type(multiplier) == matrix:
+      if self.cnt_col() != multiplier.cnt_row():
+        return error, matrix(result)
+      for row in range(self.cnt_row()):
+        result.append([])
+        for col in range(multiplier.cnt_col()):
+          result[row].append(0)
+          for step in range(self.cnt_col()):
+            result[row][col] += self.get(row, step) * multiplier.get(step, col)
+      return 'OK', matrix(result)
+    elif type(multiplier) == vector:
+      if self.cnt_col() != multiplier.size():
+        return error, vector(result)
+      for row in range(self.cnt_row()):
+        result.append(0)
+        for col in range(self.cnt_col()):
+          result[row] += self.get(row, col) * multiplier.get_elem(col)
+      return 'OK', vector(result)
