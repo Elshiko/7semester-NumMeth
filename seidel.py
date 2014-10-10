@@ -5,7 +5,7 @@ class seidel:
   def __init__(self):
     pass
 
-  def transform(self, old_matr, old_vect):
+  def __transform(self, old_matr, old_vect):
     """Convert matrix A to B in eq Ax=b to x=Bx+h"""
     dim = old_matr.cnt_row()
     for row in range(dim):
@@ -26,14 +26,14 @@ class seidel:
       old_matr.set_elem(row, row, 0.0)
     return old_matr, old_vect, "OK"
 
-  def check_precision(cur_approx, next_approx, precision):
+  def __check_precision(cur_approx, next_approx, precision):
     """Check ||x(k) - x(k+1)|| <= precision"""
     rate = 0
     for num in range(next_approx.size()):
       rate += (cur_approx.get_elem(num) - next_approx.get_elem(num)) ** 2
     return pow(rate, 0.5) <= precision
 
-  def calculate_real_precision(self, rate, precision):
+  def __calculate_real_precision(self, rate, precision):
     """Transform preciosion, maybe it need to remove"""
     return ((1 - rate)/rate)*precision
 
@@ -49,7 +49,7 @@ class seidel:
       error = 'Different size of matrix and vector'
       return vect, error
     dim = vect.size()
-    matr, vect, error = self.transform(matr, vect)
+    matr, vect, error = self.__transform(matr, vect)
     if error != 'OK':
       return vect, error
     upper_triangular, lower_triangular, error = matr.diagonal_split()
@@ -69,7 +69,7 @@ class seidel:
       return vect, error
     cur_approx = vector(vect)
     next_approx = vector(vect)
-    precision = self.calculate_real_precision(matr.rate(), precision)
+    precision = self.__calculate_real_precision(matr.rate(), precision)
     for iteration_num in range(iterations):
       error, next_approx = kth_step_matr.multiply(cur_approx)
       if error != 'OK':
@@ -77,11 +77,10 @@ class seidel:
       error = next_approx.add(vect)
       if error != 'OK':
         return vect, error
-      if seidel.check_precision(cur_approx, next_approx, precision):
+      if seidel.__check_precision(cur_approx, next_approx, precision):
         break
       cur_approx = vector(next_approx)
     return next_approx, error
-
    # for iteration_num in range(iterations):
    #   for row in range(dim):
    #     new_elem = 0
