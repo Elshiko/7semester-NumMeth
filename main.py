@@ -7,7 +7,8 @@ import json
 import sys
 
 exist_args = ['help', 'input_file', 'input_type', 'output_type',
-              'output_file', 'precision', 'separator', 'iterations', 'amount']
+              'output_file', 'precision', 'separator', 'iterations', 'amount',
+              'method']
 
 def parse_params():
   params = {}
@@ -44,6 +45,8 @@ def set_default(params):
     params['iterations'] = 10 ** 6
   if 'amount' not in params:
     params['amount'] = 10
+  if 'method' not in params:
+    params['method'] = 'SEIDEL'
 
 def print_help():
   print('--help --> print this information\n'
@@ -59,7 +62,9 @@ def print_help():
   'precision=X --> X is a number, precision of calculation\n'
   'separator=S --> S is separator in .csv file\n'
   'iterations=Z --> Z is number of iterations\n'
-  'amount=Z --> amount of numbers after . in double\n')
+  'amount=Z --> amount of numbers after . in double\n'
+  'method=METH --> choose the way of solving problem\n'
+  'METH = \'SEIDEL\' or \'IMPLICIT\'')
 
 error = 'OK'
 params, error = parse_params()
@@ -67,7 +72,7 @@ if error != 'OK':
   print(error)
 else:
   set_default(params)
-  precision = params['precision']
+  precision = float(params['precision'])
   iterations = params['iterations']
   params['amount'] = int(params['amount'])
   if params['help'] == 'y':
@@ -88,7 +93,10 @@ else:
     matr = matrix(matr_list)
     vect = vector(vect_list)
     solver = seidel()
-    solution, error = solver.find_solution(matr, vect, precision, iterations)
+    if params['method'] == 'SEIDEL':
+      solution, error = solver.find_solution(matr, vect, precision, iterations)
+    else:
+      pass
     if error != 'OK':
       print(error)
       exit(1)
