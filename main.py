@@ -2,6 +2,7 @@
 from matrix import matrix
 from vector import vector
 from seidel import seidel
+from implicit import implicit
 import io_lib
 import json
 import sys
@@ -27,8 +28,8 @@ def parse_params():
       elif arg[0] == '--help' and len(arg) == 1:
         params['help'] = 'y'
       else:
-        return params, 'Invalid parameter ' + str(arg)
-  return params, 'OK'
+        raise Exception('Invalid parameter ' + str(arg))
+  return params
 
 def set_default(params):
   if 'help' not in params:
@@ -63,46 +64,49 @@ def print_help():
   'separator=S --> S is separator in .csv file\n'
   'iterations=Z --> Z is number of iterations\n'
   'amount=Z --> amount of numbers after . in double\n'
-  'method=METH --> choose the way of solving problem\n'
-  'METH = \'SEIDEL\' or \'IMPLICIT\'')
+  'method=METHOD --> choose the way of solving problem\n'
+  'METHOD = \'SEIDEL\' or \'IMPLICIT\'')
 
-error = 'OK'
-params, error = parse_params()
-if error != 'OK':
-  print(error)
+try:
+  params = parse_params()
+except Exception as error_msg:
+  print(error_msg)
+  exit(1)
+set_default(params)
+precision = float(params['precision'])
+iterations = params['iterations']
+params['amount'] = int(params['amount'])
+if params['help'] == 'y':
+  print_help()
+  exit(0)
 else:
-  set_default(params)
-  precision = float(params['precision'])
-  iterations = params['iterations']
-  params['amount'] = int(params['amount'])
-  if params['help'] == 'y':
-    print_help()
-    exit(0)
-  else:
-    matr_list = []
-    vect_list = []
+  matr_list = []
+  vect_list = []
+  try:
     if 'input_file' in params:
-      matr_list, vect_list, error = io_lib.read(params['input_file'], params['input_type'],
+      matr_list, vect_list = io_lib.read(params['input_file'], params['input_type'],
           params['separator'], matr_list, vect_list, True)
     else:
-      matr_list, vect_list, error = io_lib.read('', params['input_type'],
+      matr_list, vect_list = io_lib.read('', params['input_type'],
           params['separator'], matr_list, vect_list, False)
-    if error != 'OK':
-      print(error)
-      exit(1)
-    matr = matrix(matr_list)
-    vect = vector(vect_list)
-    solver = seidel()
+  except Exception as error_msg:
+    print(error_msg)
+    exit(1)
+  matr = matrix(matr_list)
+  vect = vector(vect_list)
+  try:
     if params['method'] == 'SEIDEL':
-      solution, error = solver.find_solution(matr, vect, precision, iterations)
+      solver = seidel()
+      solution = solver.use_seidel(matr, vect, precision, iterations)
     else:
-      pass
-    if error != 'OK':
-      print(error)
-      exit(1)
-    if 'output_file' in params:
-      io_lib.write(params['output_file'], params['output_type'],
-          params['separator'], solution, True, params['amount'])
-    else:
-      io_lib.write('', params['output_type'],
-          params['separator'], solution, False, params['amount'])
+      solver = implicit()
+      solution = solver.use_implicit(matr, vect, precision, iterations)
+  except Exception as error_msg:
+    print(error_msg)
+    exit(1)
+  if 'output_file' in params:
+    io_lib.write(params['output_file'], params['output_type'],
+        params['separator'], solution, True, params['amount'])
+  else:
+    io_lib.write('', params['output_type'],
+        params['separator'], solution, False, params['amount'])

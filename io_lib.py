@@ -44,13 +44,13 @@ def read(filename, input_type, separator, matr_list, vect_list, need_file):
       data = input()
     data = json.loads(data)
     if type(data) != list:
-      return matr_list, vect_list, json_error
+      raise Exception(json_error)
     for row in data:
       if type(row) != list:
-        return matr_list, vect_list, json_error
+        raise Exception(json_error)
       matr_list.append(row[:-1])
       vect_list.append(row[-1])
-  return matr_list, vect_list, 'OK'
+  return matr_list, vect_list
 
 def write(filename, output_type, separator, solution, need_file, amount):
   if output_type == 'CSV':

@@ -16,7 +16,7 @@ class seidel:
             old_vect.add_elem(row, old_vect.get_elem(to_add))
             break
       if old_matr.get(row, row) == 0:
-        return old_matr, old_vect, "Exist column with 0 in all rows"
+        raise Exception("Exist column with 0 in all rows")
     #if not old_matr.diagonal_dominance():
     #  return old_matr, old_vect, "There no diagonal dominance"
     for row in range(dim):
@@ -24,7 +24,7 @@ class seidel:
       old_matr.mult_row(row, multiplier)
       old_vect.mult_elem(row, -multiplier)
       old_matr.set_elem(row, row, 0.0)
-    return old_matr, old_vect, "OK"
+    return old_matr, old_vect
 
   def __check_precision(cur_approx, next_approx, precision):
     """Check ||x(k) - x(k+1)|| <= precision"""
@@ -37,59 +37,30 @@ class seidel:
     """Transform preciosion, maybe it need to remove"""
     return ((1 - rate)/rate)*precision
 
-  def find_solution(self, matr, vect, precision, iterations):
+  def use_seidel(self, matr, vect, precision, iterations):
     """Main method of class seidel, returns solution of Ax=b,
         params: A --> matr, b --> vect, precision --> effect on number of steps,
         iterations --> max number of steps"""
-    error = "OK"
     if not matr.is_square():
-      error = 'Coefficient matrix is not square'
-      return vect, error
+      raise Exception('Coefficient matrix is not square')
     if matr.cnt_row() != vect.size():
-      error = 'Different size of matrix and vector'
-      return vect, error
+      raise Exception('Different size of matrix and vector')
     dim = vect.size()
-    matr, vect, error = self.__transform(matr, vect)
-    if error != 'OK':
-      return vect, error
-    upper_triangular, lower_triangular, error = matr.diagonal_split()
-    if error != 'OK':
-      return vect, error
+    matr, vect = self.__transform(matr, vect)
+    upper_triangular, lower_triangular = matr.diagonal_split()
     ed_matr = matrix()
     ed_matr.generate_e(matr.cnt_row())
-    error = ed_matr.minus(lower_triangular)
-    if error != 'OK':
-      return vect, error
+    ed_matr.minus(lower_triangular)
     rev = ed_matr.find_lower_square_reverse()
-    error, kth_step_matr = rev.multiply(upper_triangular)
-    if error != 'OK':
-      return vect, error
-    error, vect = rev.multiply(vect)
-    if error != 'OK':
-      return vect, error
+    kth_step_matr = rev.multiply(upper_triangular)
+    vect = rev.multiply(vect)
     cur_approx = vector(vect)
     next_approx = vector(vect)
     precision = self.__calculate_real_precision(matr.rate(), precision)
     for iteration_num in range(iterations):
-      error, next_approx = kth_step_matr.multiply(cur_approx)
-      if error != 'OK':
-        return vect, error
-      error = next_approx.add(vect)
-      if error != 'OK':
-        return vect, error
+      next_approx = kth_step_matr.multiply(cur_approx)
+      next_approx.add(vect)
       if seidel.__check_precision(cur_approx, next_approx, precision):
         break
       cur_approx = vector(next_approx)
-    return next_approx, error
-   # for iteration_num in range(iterations):
-   #   for row in range(dim):
-   #     new_elem = 0
-   #     for col in range(dim):
-   #       new_elem += next_approx.get_elem(col)*lower_triangular.get(row, col)
-   #       new_elem += cur_approx.get_elem(col)*upper_triangular.get(row, col)
-   #     new_elem += vect.get_elem(row)
-   #     next_approx.set_elem(row, new_elem)
-   #   if seidel.check_precision(cur_approx, next_approx, precision):
-   #     break
-   #   cur_approx = vector(next_approx)
-    return next_approx, error
+    return next_approx

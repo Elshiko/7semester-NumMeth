@@ -85,25 +85,24 @@ class matrix:
     upper_triangular = []
     lower_triangular = []
     if not self.is_square():
-      return upper_triangular, lower_triangular, 'Maxtrix must be square'
+      raise Exception('Maxtrix must be square')
     size = self.cnt_row()
     for row in range(size):
       lower_triangular.append(self.__data[row][:row] + [0.0] * (size - row))
       upper_triangular.append([0.0] * row + self.__data[row][row:])
     upper_triangular = matrix(upper_triangular)
     lower_triangular = matrix(lower_triangular)
-    return upper_triangular, lower_triangular, 'OK'
+    return upper_triangular, lower_triangular
 
   def get_dim(self):
     return self.cnt_row(), self.cnt_col()
 
   def minus(self, subtrahend):
     if self.get_dim() != subtrahend.get_dim():
-      return 'Some problems with dimension'
+      raise Exception('Some problems with dimension')
     for row in range(self.cnt_row()):
       for col in range(self.cnt_col()):
         self.__data[row][col] -= subtrahend.get(row, col)
-    return 'OK'
 
   def add_row_with_ratio(self, row, to_add, ratio):
     if self.cnt_row() > 0:
@@ -121,23 +120,24 @@ class matrix:
     return rev
 
   def multiply(self, multiplier):
-    error = 'Number of columns in first matrix must equal number of rows in second multiplier(matrix/vector)'
+    error_msg = ('Number of columns in first matrix must be equal '
+    'number of rows in second multiplier(matrix/vector)')
     result = []
     if type(multiplier) == matrix:
       if self.cnt_col() != multiplier.cnt_row():
-        return error, matrix(result)
+        raise Exception(error_msg)
       for row in range(self.cnt_row()):
         result.append([])
         for col in range(multiplier.cnt_col()):
           result[row].append(0)
           for step in range(self.cnt_col()):
             result[row][col] += self.get(row, step) * multiplier.get(step, col)
-      return 'OK', matrix(result)
+      return matrix(result)
     elif type(multiplier) == vector:
       if self.cnt_col() != multiplier.size():
-        return error, vector(result)
+        raise Exception(error_msg)
       for row in range(self.cnt_row()):
         result.append(0)
         for col in range(self.cnt_col()):
           result[row] += self.get(row, col) * multiplier.get_elem(col)
-      return 'OK', vector(result)
+      return vector(result)
