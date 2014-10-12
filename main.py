@@ -74,7 +74,7 @@ except Exception as error_msg:
   exit(1)
 set_default(params)
 precision = float(params['precision'])
-iterations = params['iterations']
+iterations = int(params['iterations'])
 params['amount'] = int(params['amount'])
 if params['help'] == 'y':
   print_help()

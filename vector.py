@@ -51,6 +51,10 @@ class vector:
     if num < self.size():
       self.__data[num] += add
 
+  def mult_by_number(self, multiplier):
+    for i in range(self.size()):
+      self.mult_elem(i, multiplier)
+
   def rate(self):
     """Euclidean rate"""
     rate = 0
@@ -84,3 +88,13 @@ class vector:
       return 'OK'
     else:
       return 'Need ' + str(type(self)) + ', but recieved ' + str(type(to_add))
+
+  def scalar_mult(self, multiplier):
+    if type(multiplier) != vector:
+      raise Exception('In scalar_mult multiplier must be vector type')
+    if self.size() != multiplier.size():
+      raise Exception('Some problems with dimension')
+    result = 0
+    for num in range(self.size()):
+      result += self.get_elem(num)*multiplier.get_elem(num)
+    return result

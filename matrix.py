@@ -119,6 +119,11 @@ class matrix:
           rev.add_row_with_ratio(row, col, -multiplier)
     return rev
 
+  def multiply_by_number(self, multiplier):
+    for row in range(self.cnt_row):
+      for col in range(self.cnt_col):
+        self._data[row][col] *= multiplier
+
   def multiply(self, multiplier):
     error_msg = ('Number of columns in first matrix must be equal '
     'number of rows in second multiplier(matrix/vector)')
@@ -141,3 +146,22 @@ class matrix:
         for col in range(self.cnt_col()):
           result[row] += self.get(row, col) * multiplier.get_elem(col)
       return vector(result)
+
+  def is_symmetric(self):
+    eps = 1e-12
+    if not self.is_square:
+      return False
+    for row in range(self.cnt_row()):
+      for col in range(self.cnt_col()):
+        if abs(self.get(row, col) - self.get(col, row)) > eps:
+          return False
+    return True
+
+  def transpose(self):
+    trans_list = []
+    for row in self.__data:
+      trans_list.append(row[:])
+    for row in range(len(trans_list)):
+      for col in range(row + 1, len(trans_list[row])):
+        trans_list[row][col], trans_list[col][row] = trans_list[col][row], trans_list[row][col]
+    return matrix(trans_list)
