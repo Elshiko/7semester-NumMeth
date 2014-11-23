@@ -4,6 +4,7 @@ from vector import vector
 from seidel import seidel
 from implicit import implicit
 from matplotlib import pyplot
+from datetime import datetime
 import io_lib
 import json
 import sys
@@ -105,16 +106,24 @@ else:
     exit(1)
   matr = matrix(matr_list)
   vect = vector(vect_list)
+  deltatime = 0
   try:
     if params['method'] == 'SEIDEL':
       solver = seidel()
+      deltatime = datetime.now()
       statistics, solution = solver.use_seidel(matr, vect, precision, iterations, silent, interval)
+      deltatime = datetime.now() - deltatime
     else:
       solver = implicit()
+      deltatime = datetime.now()
       statistics, solution = solver.use_implicit(matr, vect, precision, iterations, silent, interval)
+      deltatime = datetime.now() - deltatime
   except Exception as error_msg:
     print(error_msg)
     exit(1)
+  if not silent:
+    print('time - ' + str(deltatime))
+    print('Dimension of matrix ' + str(matr.cnt_row()))
   if 'output_file' in params:
     io_lib.write(params['output_file'], params['output_type'],
         params['separator'], solution, True, params['amount'])
@@ -127,4 +136,6 @@ else:
       for error in statistics[1]:
         max_error = max(max_error, error)
       pyplot.axis([1, interval * len(statistics[0]), 0, max_error * 1.2])
+      pyplot.xlabel('iteration')
+      pyplot.ylabel('error')
       pyplot.show()
