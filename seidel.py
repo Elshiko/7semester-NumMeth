@@ -3,7 +3,7 @@ from matrix import matrix
 
 class seidel:
   def __init__(self):
-    pass
+    self.__eps = 1e-11
 
   def __transform(self, old_matr, old_vect):
     """Convert matrix A to B in eq Ax=b to x=Bx+h"""
@@ -26,18 +26,22 @@ class seidel:
       old_matr.set_elem(row, row, 0.0)
     return old_matr, old_vect
 
-  def __check_precision(cur_approx, next_approx, precision):
+  def __check_precision(self, cur_approx, next_approx, precision):
     """Check ||x(k) - x(k+1)|| <= precision"""
     rate = 0
     for num in range(next_approx.size()):
-      rate += (cur_approx.get_elem(num) - next_approx.get_elem(num)) ** 2
-    return pow(rate, 0.5) <= precision
+      if cur_approx.get_elem(num) - next_approx.get_elem(num) > self.__eps:
+        temp = cur_approx.get_elem(num) - next_approx.get_elem(num)
+        temp = temp*temp if temp > self.__eps else 0
+        rate += temp
+    rate = rate if rate > self.__eps else 0
+    return pow(rate, 0.5) <= precision, pow(rate, 0.5)
 
   def __calculate_real_precision(self, rate, precision):
     """Transform preciosion, maybe it need to remove"""
     return ((1 - rate)/rate)*precision
 
-  def use_seidel(self, matr, vect, precision, iterations):
+  def use_seidel(self, matr, vect, precision, iterations, silent, interval):
     """Main method of class seidel, returns solution of Ax=b,
         params: A --> matr, b --> vect, precision --> effect on number of steps,
         iterations --> max number of steps"""
@@ -56,11 +60,23 @@ class seidel:
     vect = rev.multiply(vect)
     cur_approx = vector(vect)
     next_approx = vector(vect)
-    precision = self.__calculate_real_precision(matr.rate(), precision)
+    self.__eps = precision
+    statistics = [[],[]]
+    if kth_step_matr.determinant() > 1:
+      raise Exception('Matrix determinant > 1')
     for iteration_num in range(iterations):
       next_approx = kth_step_matr.multiply(cur_approx)
       next_approx.add(vect)
-      if seidel.__check_precision(cur_approx, next_approx, precision):
+      is_accurate, error = self.__check_precision(cur_approx, next_approx, precision)
+      if is_accurate:
+        if interval != 0:
+          statistics[0].append(iteration_num + 1)
+          statistics[1].append(error)
+        if not silent:
+          print('Total number of iterations = ' + str(iteration_num))
         break
+      if interval != 0 and iteration_num % interval == 0:
+        statistics[0].append(iteration_num + 1)
+        statistics[1].append(error)
       cur_approx = vector(next_approx)
-    return next_approx
+    return statistics, next_approx

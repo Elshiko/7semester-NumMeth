@@ -165,3 +165,20 @@ class matrix:
       for col in range(row + 1, len(trans_list[row])):
         trans_list[row][col], trans_list[col][row] = trans_list[col][row], trans_list[row][col]
     return matrix(trans_list)
+
+  def determinant(self):
+    det = 0
+    if not self.is_square():
+      raise Exception('Need suqare matrix')
+    if self.cnt_col() == 1:
+      return self.get(0,0)
+    for col in range(self.cnt_col()):
+      matr_list = []
+      for row in range(1, self.cnt_row()):
+        matr_list.append(self.__data[row][:col] + self.__data[row][col + 1:])
+      if col % 2 == 0:
+        det += self.get(0, col) * matrix(matr_list).determinant()
+      else:
+        det -= self.get(0, col) * matrix(matr_list).determinant()
+    return det
+

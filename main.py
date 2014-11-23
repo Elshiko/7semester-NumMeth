@@ -3,13 +3,14 @@ from matrix import matrix
 from vector import vector
 from seidel import seidel
 from implicit import implicit
+from matplotlib import pyplot
 import io_lib
 import json
 import sys
 
 exist_args = ['help', 'input_file', 'input_type', 'output_type',
               'output_file', 'precision', 'separator', 'iterations', 'amount',
-              'method']
+              'method', 'silent', 'statistics']
 
 def parse_params():
   params = {}
@@ -27,6 +28,8 @@ def parse_params():
           params[arg] = value
       elif arg[0] == '--help' and len(arg) == 1:
         params['help'] = 'y'
+      elif arg[0] == '--silent' and len(arg) == 1:
+        params['silent'] = 'y'
       else:
         raise Exception('Invalid parameter ' + str(arg))
   return params
@@ -48,12 +51,16 @@ def set_default(params):
     params['amount'] = 10
   if 'method' not in params:
     params['method'] = 'SEIDEL'
+  if 'silent' not in params:
+    params['silent'] = 'n'
+  if 'statistics' not in params:
+    params['statistics'] = 1
 
 def print_help():
   print('--help --> print this information\n'
-  '--input_file=$PATH --> read equation from that file\n'
+  '--input_file=PATH --> read equation from that file\n'
   'Deafault mode = read from stdin\n'
-  'output_file=$PATH --> print answer to that file\n'
+  'output_file=PATH --> print answer to that file\n'
   'Deafault mode = print to stdout\n'
   'input_type=FORMAT --> read equation as you choose\n'
   'output_type=FORMAT --> print equation as you choose\n'
@@ -65,7 +72,9 @@ def print_help():
   'iterations=Z --> Z is number of iterations\n'
   'amount=Z --> amount of numbers after . in double\n'
   'method=METHOD --> choose the way of solving problem\n'
-  'METHOD = \'SEIDEL\' or \'IMPLICIT\'')
+  'METHOD = \'SEIDEL\' or \'IMPLICIT\'\n'
+  'silent --> turn off printing number of iterations\n'
+  'statistics=X --> every X iterations set one point on chart, 0 = OFF, default = 1')
 
 try:
   params = parse_params()
@@ -76,6 +85,8 @@ set_default(params)
 precision = float(params['precision'])
 iterations = int(params['iterations'])
 params['amount'] = int(params['amount'])
+silent = True if params['silent'] == 'y' else False
+interval = int(params['statistics'])
 if params['help'] == 'y':
   print_help()
   exit(0)
@@ -97,10 +108,10 @@ else:
   try:
     if params['method'] == 'SEIDEL':
       solver = seidel()
-      solution = solver.use_seidel(matr, vect, precision, iterations)
+      statistics, solution = solver.use_seidel(matr, vect, precision, iterations, silent, interval)
     else:
       solver = implicit()
-      solution = solver.use_implicit(matr, vect, precision, iterations)
+      statistics, solution = solver.use_implicit(matr, vect, precision, iterations, silent, interval)
   except Exception as error_msg:
     print(error_msg)
     exit(1)
@@ -110,3 +121,10 @@ else:
   else:
     io_lib.write('', params['output_type'],
         params['separator'], solution, False, params['amount'])
+  if params['statistics'] != 0:
+    pyplot.plot(statistics[0], statistics[1], 'r--')
+    max_error = statistics[1][0]
+    for error in statistics[1]:
+      max_error = max(max_error, error)
+    pyplot.axis([1, interval * len(statistics[0]), 0, max_error * 1.2])
+    pyplot.show()

@@ -19,6 +19,7 @@ class implicit:
     return matr
 
   def __calculate_xi(self, matr, matr_m):
+    #TODO FIX IT
     return 1/matr.multiply(matr_m.find_lower_square_reverse()).rate()
 
   def __calculate_ro(self, matr, matr_m):
@@ -60,7 +61,7 @@ class implicit:
     print()
     return next_approx
 
-  def use_implicit(self, matr, vect, precision, iterations):
+  def use_implicit(self, matr, vect, precision, iterations, silent, interval):
     """Main method of class implicit, returns solution of Ax=b,
         params: A --> matr, b --> vect, precision --> effect on number of steps,
         iterations --> max number of steps"""
@@ -73,7 +74,8 @@ class implicit:
     tau = self.__calculate_tau(matr)
     ro = self.__calculate_ro(matr, matr_m)
     t_list = list(self.__calculate_tau_list(tau, iterations, ro))
-    cur_approx = vector(vect)
+    cur_approx = vector([0]*vect.size())
+    print(cur_approx)
     matr_m = matr_m.find_lower_square_reverse()
     for t in t_list:
       cur_approx = self.__next_step(matr_m, matr, vect, cur_approx, t)
