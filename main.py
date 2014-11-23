@@ -38,7 +38,7 @@ def set_default(params):
   if 'help' not in params:
     params['help'] = 'n'
   if 'precision' not in params:
-    params['precision'] = 1e-9
+    params['precision'] = 9
   if 'input_type' not in params:
     params['input_type'] = 'interactive'
   if 'output_type' not in params:
@@ -60,21 +60,21 @@ def print_help():
   print('--help --> print this information\n'
   '--input_file=PATH --> read equation from that file\n'
   'Deafault mode = read from stdin\n'
-  'output_file=PATH --> print answer to that file\n'
+  '--output_file=PATH --> print answer to that file\n'
   'Deafault mode = print to stdout\n'
-  'input_type=FORMAT --> read equation as you choose\n'
-  'output_type=FORMAT --> print equation as you choose\n'
+  '--input_type=FORMAT --> read equation as you choose\n'
+  '--output_type=FORMAT --> print equation as you choose\n'
   'FORMAT = \'JSON\', or \'interactive\', or \'CSV\'\n'
   'JSON & CSV consist of N lines of N+1 element, matrix N*N and column of free terms\n'
   'interactive format: N - dim of matrix, N lines of N elements, 1 line of N elements(free terms)\n'
-  'precision=X --> X is a number, precision of calculation\n'
-  'separator=S --> S is separator in .csv file\n'
-  'iterations=Z --> Z is number of iterations\n'
-  'amount=Z --> amount of numbers after . in double\n'
-  'method=METHOD --> choose the way of solving problem\n'
+  '--precision=X --> X is a number, precision of calculation 10^-X\n'
+  '--separator=S --> S is separator in .csv file\n'
+  '--iterations=Z --> Z is number of iterations\n'
+  '--amount=Z --> amount of numbers after . in double\n'
+  '--method=METHOD --> choose the way of solving problem\n'
   'METHOD = \'SEIDEL\' or \'IMPLICIT\'\n'
-  'silent --> turn off printing number of iterations\n'
-  'statistics=X --> every X iterations set one point on chart, 0 = OFF, default = 1')
+  '--silent --> turn off printing number of iterations\n'
+  '--statistics=X --> every X iterations set one point on chart, 0 = OFF, default = 1')
 
 try:
   params = parse_params()
@@ -82,7 +82,7 @@ except Exception as error_msg:
   print(error_msg)
   exit(1)
 set_default(params)
-precision = float(params['precision'])
+precision = 10 ** (-1 * int(params['precision']))
 iterations = int(params['iterations'])
 params['amount'] = int(params['amount'])
 silent = True if params['silent'] == 'y' else False
@@ -121,10 +121,10 @@ else:
   else:
     io_lib.write('', params['output_type'],
         params['separator'], solution, False, params['amount'])
-  if params['statistics'] != 0:
-    pyplot.plot(statistics[0], statistics[1], 'r--')
-    max_error = statistics[1][0]
-    for error in statistics[1]:
-      max_error = max(max_error, error)
-    pyplot.axis([1, interval * len(statistics[0]), 0, max_error * 1.2])
-    pyplot.show()
+    if params['statistics'] != '0':
+      pyplot.plot(statistics[0], statistics[1], 'r--')
+      max_error = statistics[1][0]
+      for error in statistics[1]:
+        max_error = max(max_error, error)
+      pyplot.axis([1, interval * len(statistics[0]), 0, max_error * 1.2])
+      pyplot.show()
