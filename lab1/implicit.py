@@ -57,8 +57,6 @@ class implicit:
     matr_a = matr.multiply(cur_approx)
     matr_a.mult_by_number(t)
     next_approx.add(matr_a)
-    next_approx.print()
-    print()
     return next_approx
 
   def use_implicit(self, matr, vect, precision, iterations, silent, interval):
@@ -75,8 +73,7 @@ class implicit:
     ro = self.__calculate_ro(matr, matr_m)
     t_list = list(self.__calculate_tau_list(tau, iterations, ro))
     cur_approx = vector([0]*vect.size())
-    print(cur_approx)
     matr_m = matr_m.find_lower_square_reverse()
     for t in t_list:
       cur_approx = self.__next_step(matr_m, matr, vect, cur_approx, t)
-    return cur_approx
+    return [[]], cur_approx

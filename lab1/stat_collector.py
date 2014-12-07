@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timedelta
 import time
 import subprocess
+import numpy
 
 def get_timedelta(time):
   buf = time.split('-')

@@ -11,6 +11,7 @@ def show_help():
         'help --> show this message\n')
 
 def gen_random(n, low, up):
+  diag_dom_val = 2 * n
   matr_list = []
   delta = up - low
   for row in range(n):
@@ -18,10 +19,10 @@ def gen_random(n, low, up):
     for col in range(n):
       matr_list[-1].append(random.random())
       if col == row:
-        matr_list[-1][-1] *= 10
-      matr_list[-1][-1] = (matr_list[-1][-1] / 10 * delta) + low
+        matr_list[-1][-1] *= diag_dom_val
+      matr_list[-1][-1] = (matr_list[-1][-1] / diag_dom_val * delta) + low
     matr_list[-1].append(random.random())
-    matr_list[-1][-1] = (matr_list[-1][-1] / 10 * delta) + low
+    matr_list[-1][-1] = (matr_list[-1][-1] / diag_dom_val * delta) + low
   print(matr_list)
 
 exist_args = ['dimension', 'lower_limit', 'upper_limit', 'matrix_type']

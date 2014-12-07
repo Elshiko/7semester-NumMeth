@@ -1,4 +1,5 @@
 from vector import vector
+import numpy
 
 class matrix:
   #format data[i] - i-th row in matrix
@@ -168,6 +169,8 @@ class matrix:
 
   def determinant(self):
     det = 0
+    det = numpy.linalg.det(self.__data)
+    return det
     if not self.is_square():
       raise Exception('Need suqare matrix')
     if self.cnt_col() == 1:
@@ -181,4 +184,3 @@ class matrix:
       else:
         det -= self.get(0, col) * matrix(matr_list).determinant()
     return det
-
