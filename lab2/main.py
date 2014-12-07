@@ -2,6 +2,7 @@
 import math
 import sys
 import spline
+import matplotlib.pyplot as pplot
 
 def show_help():
   print('help --> show this message\n'
@@ -11,7 +12,7 @@ def show_help():
         'graph=C --> y - enable charts, n - disable\n'
         'check_points=X --> number of points between X[k] and X[k + 1]\n'
         'silent=y/n --> enable/disable silent mode, :::All char except \'y\' = \'n\'\n'
-        'chart=TYPE --> set chart type DELTA or BOTH')
+        'chart=TYPE --> set chart type DELTA or BOTH, DELTA_PERCENT')
 
 exist_args = ['func', 'nodes', 'interval', 'graph', 'check_points', 'silent', 'chart']
 params = {'func' : '$x', 'nodes' : '2', 'interval' : '0-1', 'graph' : 'y', 'check_points' : '10', 'silent' : 'n', 'chart' : 'DELTA'}
@@ -45,4 +46,34 @@ if params['silent'] == 'y':
 else:
   params['silent'] = False
 
-spline.do_interpolation(params['func'], params['nodes'], params['interval'][0], params['interval'][1], params['graph'], params['check_points'])
+x, func, interpolated, max_delta = spline.do_interpolation(params['func'], params['nodes'], params['interval'][0], params['interval'][1], params['graph'], params['check_points'])
+
+if not params['silent']:
+  pattern = '{0:.10f}'
+  print('Maximum delta between real and interpolated functions = ' + str(max_delta))
+  print('All values of x, real function and interpolation')
+  zipped = zip(x, func, interpolated)
+  for xval, f, i in zipped:
+    print(pattern.format(xval), end = '')
+    print('  :  ', end = '')
+    print(pattern.format(f), end = '')
+    print('   -   ', end = '')
+    print(pattern.format(i))
+
+if params['chart'] == 'BOTH':
+  pplot.plot(x, func, 'bs', x, interpolated, 'g^')
+  pplot.xlabel('x')
+  pplot.ylabel('function values')
+  pplot.show()
+elif params['chart'] == 'DELTA':
+  all_delta = list(map(lambda a, b: abs(a - b), func, interpolated))
+  pplot.plot(x, all_delta, 'b--')
+  pplot.xlabel('x')
+  pplot.ylabel('value of delta')
+  pplot.show()
+else:
+  all_delta = list(map(lambda a, b: abs((a - b)/a), func, interpolated))
+  pplot.plot(x, all_delta, 'b--')
+  pplot.xlabel('x')
+  pplot.ylabel('delta/function value')
+  pplot.show()

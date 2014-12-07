@@ -54,6 +54,8 @@ def do_interpolation(func, num_of_nodes, left_bound, right_bound, graph, check_p
   #h[k] = x[k+1] - x[k]
   #in book h[k] = x[k] - x[k - 1]
   h = (right_bound - left_bound) / (num_of_nodes - 1)
+  left_bound = float(left_bound)
+  right_bound = float(right_bound)
   list_of_nodes = []
   func_values = []
   fx = compute(func, left_bound)
