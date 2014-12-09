@@ -34,8 +34,8 @@ params['interval'] = params['interval'].split('-')
 if len(params['interval']) != 2:
   print('Incorrect interval')
   exit(1)
-params['interval'][0] = int(params['interval'][0])
-params['interval'][1] = int(params['interval'][1])
+params['interval'][0] = float(params['interval'][0])
+params['interval'][1] = float(params['interval'][1])
 if params['graph'] == 'y':
   params['graph'] = True
 else:
@@ -72,8 +72,9 @@ elif params['chart'] == 'DELTA':
   pplot.ylabel('value of delta')
   pplot.show()
 else:
-  all_delta = list(map(lambda a, b: abs((a - b)/a), func, interpolated))
+  function = lambda a, b: 100 * abs((a - b)/a)
+  all_delta = list(map(function, func, interpolated))
   pplot.plot(x, all_delta, 'b--')
   pplot.xlabel('x')
-  pplot.ylabel('delta/function value')
+  pplot.ylabel('delta/function value (%)')
   pplot.show()
