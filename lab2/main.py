@@ -8,14 +8,14 @@ def show_help():
   print('help --> show this message\n'
         'func=\'EXPR\' --> function for interpolation, argument x must be $x in input\n'
         'nodes=Z --> Z - number of nodes\n'
-        'interval=A-B --> interval of interpolation [A;B]\n'
+        'interval=A%B --> interval of interpolation [A;B]\n'
         'graph=C --> y - enable charts, n - disable\n'
         'check_points=X --> number of points between X[k] and X[k + 1]\n'
         'silent=y/n --> enable/disable silent mode, :::All char except \'y\' = \'n\'\n'
         'chart=TYPE --> set chart type DELTA or BOTH, DELTA_PERCENT')
 
 exist_args = ['func', 'nodes', 'interval', 'graph', 'check_points', 'silent', 'chart']
-params = {'func' : '$x', 'nodes' : '2', 'interval' : '0-1', 'graph' : 'y', 'check_points' : '10', 'silent' : 'n', 'chart' : 'DELTA'}
+params = {'func' : '$x', 'nodes' : '2', 'interval' : '0%1', 'graph' : 'y', 'check_points' : '10', 'silent' : 'n', 'chart' : 'DELTA'}
 
 for raw_arg in sys.argv:
   if raw_arg == sys.argv[0]:
@@ -30,7 +30,7 @@ for raw_arg in sys.argv:
     params[arg[0]] = arg[1]
 
 params['nodes'] = int(params['nodes'])
-params['interval'] = params['interval'].split('-')
+params['interval'] = params['interval'].split('%')
 if len(params['interval']) != 2:
   print('Incorrect interval')
   exit(1)
