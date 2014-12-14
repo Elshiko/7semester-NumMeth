@@ -86,5 +86,5 @@ if params['is_answer']:
   pplot.subplot(in_col, in_row, 10)
   pplot.plot(x[0], y[0], 'bs', x[1], y[1], 'gs', x[2], y[2], 'rs', x[3], y[3], 'g^')
   pplot.xlabel('x')
-  pplot.ylabel('abs(y - real)')
+  pplot.ylabel('y')
 pplot.show()
